@@ -71,30 +71,13 @@ class State(rx.State):
     def set_input_text(self, value: str):
         self.input_text = value
 
-    def flecha_arriba(self):
-        if not self.historial_mensajes:
-            return
-        if self.indice_historial > 0:
-            self.indice_historial -= 1
-            self.input_text = self.historial_mensajes[self.indice_historial]
-
-    def flecha_abajo(self):
-        if not self.historial_mensajes:
-            return
-        if self.indice_historial < len(self.historial_mensajes) - 1:
-            self.indice_historial += 1
-            self.input_text = self.historial_mensajes[self.indice_historial]
-        elif self.indice_historial == len(self.historial_mensajes) - 1:
-            self.indice_historial = len(self.historial_mensajes)
-            self.input_text = ""
-
     def procesar_tecla_chat(self, key: str):
-        if key == "Enter":
+        if key == "Enter" and self.summoner_ready == False:
+            yield from self.buscar_invocador()
+        elif key == "Enter":
             yield from self.enviar_mensaje()
-        elif key == "ArrowUp":
-            self.flecha_arriba()
-        elif key == "ArrowDown":
-            self.flecha_abajo()
+        else:
+            return
 
     def cerrar_analisis(self):
         self.show_champ_analysis = False
